@@ -1,0 +1,1695 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Z5sz179VQiG1"
+   },
+   "source": [
+    "\n",
+    "<h3 >\n",
+    "1. Introduction</h3>\n",
+    "</div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "8YPy1_8klcTp"
+   },
+   "source": [
+    "**Customer Personality Analysis** entails a comprehensive examination of an organization's optimal clientele. This process enables a business to gain profound insights into its customer base, facilitating the adaptation of products to cater to the distinct needs, behaviors, and concerns of diverse customer types.\n",
+    "\n",
+    "By delving into customer personality analysis, a business can finely tailor its products to align with the preferences of specific target segments. Rather than allocating resources to promote a new product indiscriminately to all customers in the company's database, this analysis empowers the business to discern the most receptive customer segments. Consequently, the company can strategically direct its marketing efforts, focusing on those segments most likely to engage and make purchases, thus optimizing resource allocation and enhancing overall marketing effectiveness."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "7-urp2tLRgrA"
+   },
+   "source": [
+    "\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "zZi_WaRMb1hm"
+   },
+   "source": [
+    "\n",
+    "<center><h3 >\n",
+    "2. Importing Libraries and Data</h3></center>\n",
+    "</div>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "metadata": {
+    "id": "7yeDbRZUP44h"
+   },
+   "outputs": [
+    {
+     "ename": "ModuleNotFoundError",
+     "evalue": "No module named 'yellowbrick'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mModuleNotFoundError\u001b[0m                       Traceback (most recent call last)",
+      "Cell \u001b[0;32mIn[3], line 13\u001b[0m\n\u001b[1;32m     11\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01msklearn\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mpreprocessing\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m StandardScaler\n\u001b[1;32m     12\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01msklearn\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mdecomposition\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m PCA\n\u001b[0;32m---> 13\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01myellowbrick\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mcluster\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m KElbowVisualizer\n\u001b[1;32m     14\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01msklearn\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mcluster\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m KMeans, AgglomerativeClustering\n\u001b[1;32m     15\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m \u001b[38;5;21;01msklearn\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mmetrics\u001b[39;00m \u001b[38;5;28;01mimport\u001b[39;00m confusion_matrix\n",
+      "\u001b[0;31mModuleNotFoundError\u001b[0m: No module named 'yellowbrick'"
+     ]
+    }
+   ],
+   "source": [
+    "\n",
+    "import pandas as pd\n",
+    "import numpy as np\n",
+    "\n",
+    "import seaborn as sns\n",
+    "import matplotlib.pyplot as plt\n",
+    "import missingno as msno\n",
+    "import plotly.express as px\n",
+    "import plotly.graph_objects as go\n",
+    "from plotly.subplots import make_subplots\n",
+    "import plotly.figure_factory as ff\n",
+    "from sklearn.preprocessing import StandardScaler\n",
+    "from sklearn.decomposition import PCA\n",
+    "from yellowbrick.cluster import KElbowVisualizer\n",
+    "from sklearn.cluster import KMeans, AgglomerativeClustering\n",
+    "from sklearn.metrics import confusion_matrix\n",
+    "import warnings\n",
+    "warnings.filterwarnings('ignore')\n",
+    "pd.set_option('display.max_columns', None)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "TBoN-YHncHsL"
+   },
+   "outputs": [],
+   "source": [
+    "data = pd.read_csv('marketing_campaign.csv', sep=\"\\t\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "z_z5oA1rgBmg"
+   },
+   "source": [
+    "\n",
+    "\n",
+    "<center><h3 >\n",
+    "3. Handling Missing Values</h3></center>\n",
+    "</div>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "GRbagrSFV4TV"
+   },
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "SH_kh6QAfwEo",
+    "outputId": "74c25934-825e-490e-819e-0d3a3863ee4e"
+   },
+   "outputs": [],
+   "source": [
+    "data.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 551
+    },
+    "id": "-Vl8Cgh1gV67",
+    "outputId": "beab1c6d-7273-43db-f07d-f1a2089381ad"
+   },
+   "outputs": [],
+   "source": [
+    "msno.matrix(data);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "wH_GKUSGP1Tn"
+   },
+   "outputs": [],
+   "source": [
+    "data = data.dropna()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "iLZJx2fgaFfy",
+    "outputId": "87a0f4fa-f83d-4446-9241-c61048b5a844"
+   },
+   "outputs": [],
+   "source": [
+    "data.isnull().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "rHuJZN8hV4TX"
+   },
+   "source": [
+    "let's find if we have duplicate rows."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "IUa4hKCFfyzZ",
+    "outputId": "6fde08b8-bd22-40de-9c90-9396aa79c6e2"
+   },
+   "outputs": [],
+   "source": [
+    "data.duplicated().sum()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "NcMtPLWGRY7O"
+   },
+   "source": [
+    "\n",
+    "\n",
+    "<center><h3 >\n",
+    "4. Feature Engineering</h3></center>\n",
+    "</div>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "-9Nou79oRr0d",
+    "outputId": "9fa3dff8-6189-4758-9bdc-3a525be86c42"
+   },
+   "outputs": [],
+   "source": [
+    "data.info()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "1-8RM9fGR51l"
+   },
+   "source": [
+    "Dt_Customer that indicates the date a customer joined the database is not parsed as DateTime"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "otnk867YRzlq"
+   },
+   "outputs": [],
+   "source": [
+    "data['Dt_Customer'] = pd.to_datetime(data['Dt_Customer'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "lNTGdAUFSeb0",
+    "outputId": "1dbf0dee-bd02-49b4-bdab-56ee8d1c6bf6"
+   },
+   "outputs": [],
+   "source": [
+    "print(\"The newest customer's enrolment date in the records:\", max(data['Dt_Customer']))\n",
+    "print(\"The oldest customer's enrolment date in the records:\", min(data['Dt_Customer']))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Ez-h8hziTVm6"
+   },
+   "source": [
+    "Extract the \"Age\" of a customer by the \"Year_Birth\" indicating the birth year of the respective person."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "nCeFcvJ8ShdS"
+   },
+   "outputs": [],
+   "source": [
+    "data['Age'] = 2015 - data['Year_Birth']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "6hc7E0YGTmKa"
+   },
+   "source": [
+    "Create another feature \"Spent\" indicating the total amount spent by the customer in various categories over the span of two years."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "GQgfkdLbTh6Q"
+   },
+   "outputs": [],
+   "source": [
+    "data['Spent'] = data['MntWines'] + data['MntFruits'] + data['MntMeatProducts'] + data['MntFishProducts'] + data['MntSweetProducts'] + data['MntGoldProds']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "KbVlhjxwT41H"
+   },
+   "source": [
+    "Create another feature \"Living_With\" out of \"Marital_Status\" to extract the living situation of couples."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "16EilwzST1rl"
+   },
+   "outputs": [],
+   "source": [
+    "data['Living_With'] = data['Marital_Status'].replace({'Married':'Partner', 'Together':'Partner', 'Absurd':'Alone', 'Widow':'Alone', 'YOLO':'Alone', 'Divorced':'Alone', 'Single':'Alone'})"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "scwZQdLHUQcr"
+   },
+   "source": [
+    "Create a feature \"Children\" to indicate total children in a household that is, kids and teenagers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "n3KUSi3bUON9"
+   },
+   "outputs": [],
+   "source": [
+    "data['Children'] = data['Kidhome'] + data['Teenhome']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "HvhrPl3kUfyO"
+   },
+   "source": [
+    "To get further clarity of household, Creating feature indicating \"Family_Size\""
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "YC86q2djUdMA"
+   },
+   "outputs": [],
+   "source": [
+    "data['Family_Size'] = data['Living_With'].replace({'Alone': 1, 'Partner':2}) + data['Children']"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "GuEJhFgtUyVm"
+   },
+   "source": [
+    "Create a feature \"Is_Parent\" to indicate parenthood status"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "hk55Es8sUs9v"
+   },
+   "outputs": [],
+   "source": [
+    "data['Is_Parent'] = np.where(data.Children > 0, 1, 0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "MAKDLmRqVEmN"
+   },
+   "source": [
+    "Segmenting education levels in three groups"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "Xib_S6EAU3nz"
+   },
+   "outputs": [],
+   "source": [
+    "data['Education'] = data['Education'].replace({'Basic':'Undergraduate', '2n Cycle':'Undergraduate', 'Graduation':'Graduate', 'Master':'Postgraduate', 'PhD':'Postgraduate'})"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "jzb5pwzlV4LX"
+   },
+   "source": [
+    "Dropping some of the redundant features"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "PkAnbqt3VRhq"
+   },
+   "outputs": [],
+   "source": [
+    "to_drop = ['Marital_Status', 'Dt_Customer', 'Z_CostContact', 'Z_Revenue', 'Year_Birth', 'ID']\n",
+    "data = data.drop(to_drop, axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 0
+    },
+    "id": "1fFWl1CrWKBs",
+    "outputId": "287f48bc-329d-4ce7-88ef-c5914e2ec81c"
+   },
+   "outputs": [],
+   "source": [
+    "data.head(5)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "iXfqcIBlW3UM"
+   },
+   "source": [
+    "\n",
+    "<center><h3 >\n",
+    "5. Data Analysis and Visualization</h3></center>\n",
+    "</div>\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "1sN3YLkjWA30",
+    "outputId": "6af4e777-b993-4a8d-9cf8-316d65aed797"
+   },
+   "outputs": [],
+   "source": [
+    "data.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ffBdidlPXRM0"
+   },
+   "source": [
+    "There are 2216 cutomers and 29 features in the dataset."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "4ksorBmnXXf3",
+    "outputId": "fc134d67-4f80-4495-ab09-fad14bc07d20"
+   },
+   "outputs": [],
+   "source": [
+    "data.info()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 364
+    },
+    "id": "ckDEyknqXk8m",
+    "outputId": "5d1790a4-b45d-462b-b055-176ba2bf1480"
+   },
+   "outputs": [],
+   "source": [
+    "data.describe()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 112
+    },
+    "id": "bvtu_bfrXioh",
+    "outputId": "9e67cc00-4eb3-401c-d941-8602464c4b87"
+   },
+   "outputs": [],
+   "source": [
+    "data.describe(include=object).T"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 550
+    },
+    "id": "7CR5vasQYjO6",
+    "outputId": "3a3893f2-a99c-4235-b1c4-55e6a46c5aa0"
+   },
+   "outputs": [],
+   "source": [
+    "sns.pairplot(data , vars=['Spent','Income','Age'] , hue='Children', palette='husl');"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 497
+    },
+    "id": "5hYCjo0UVvHI",
+    "outputId": "e9ac17b9-87db-46b3-a106-1fc1b3149258"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "sns.scatterplot(x=data[data['Income']<600000]['Spent'], y=data[data['Income']<600000]['Income'], color='#cc0000');"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 497
+    },
+    "id": "FAp6rsgMVTe_",
+    "outputId": "d16c0799-0bd4-4848-e239-a0fe5bce2fb7"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "sns.scatterplot(x=data['Spent'], y=data['Age']);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 497
+    },
+    "id": "CvX-9PFrT7BL",
+    "outputId": "847158b9-ed09-4b5a-a751-0b8eafc5f3e4"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "sns.histplot(x=data['Spent'], hue=data['Education']);"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 466
+    },
+    "id": "ou69HIN7XVDr",
+    "outputId": "fca2142b-cdb2-428e-cb72-aae51775328b"
+   },
+   "outputs": [],
+   "source": [
+    "data['Education'].value_counts().plot.pie(explode=[0.1,0,0], autopct='%1.1f%%', shadow=True, figsize=(8,8), colors=sns.color_palette('bright'));"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Y_hWgI-Xhfzc"
+   },
+   "source": [
+    "# <a name='Outlier_Detection'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "6. Outlier Detection</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "B_JouO2nV4Tw"
+   },
+   "source": [
+    "The presence of outliers in a classification or regression dataset can result in a poor fit and lower predictive modeling performance, therefore we should see there are ouliers in the data."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 497
+    },
+    "id": "j1RGjVTFhygq",
+    "outputId": "e25c7e20-8a60-435a-fcfa-04aef44ccdb2"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "sns.distplot(data.Age, color='purple');"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 508
+    },
+    "id": "GAZ2lyVWh0XJ",
+    "outputId": "badf02f7-6e96-4666-9f25-b91f20db702b"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "sns.distplot(data.Income, color='Yellow');"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 497
+    },
+    "id": "7R9SeSj6h68S",
+    "outputId": "5b134739-5ca9-47f5-ea20-12771d34516b"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "sns.distplot(data.Spent, color='#ff9966');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "c-Lvut9ain3-"
+   },
+   "source": [
+    "Another way of visualising outliers is using boxplots and whiskers,\n",
+    "which provides the quantiles (box) and inter-quantile range (whiskers),\n",
+    "with the outliers sitting outside the error bars (whiskers).\n",
+    "\n",
+    "All the dots in the plot below are outliers according to the quantiles + 1.5 IQR rule"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 542
+    },
+    "id": "U4QKnKXpkxWx",
+    "outputId": "c9b57095-49e2-456c-82b3-3a3f3b441b5a"
+   },
+   "outputs": [],
+   "source": [
+    "fig = make_subplots(rows=1, cols=3)\n",
+    "\n",
+    "fig.add_trace(go.Box(y=data['Age'], notched=True, name='Age', marker_color = '#6699ff', \n",
+    "                     boxmean=True, boxpoints='suspectedoutliers'), 1, 2)\n",
+    "\n",
+    "fig.add_trace(go.Box(y=data['Income'], notched=True, name='Income', marker_color = '#ff0066', \n",
+    "                     boxmean=True, boxpoints='suspectedoutliers'), 1, 1)\n",
+    "\n",
+    "fig.add_trace(go.Box(y=data['Spent'], notched=True, name='Spent', marker_color = 'lightseagreen', \n",
+    "                     boxmean=True, boxpoints='suspectedoutliers'), 1, 3)\n",
+    "\n",
+    "fig.update_layout(title_text='<b>Box Plots for Numerical Variables<b>')\n",
+    "\n",
+    "fig.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "v6lKNlg1V4Ty"
+   },
+   "source": [
+    "<p align=\"center\">\n",
+    "  <img width=\"600\" height=\"300\" src=\"https://miro.medium.com/proxy/1*ghJQrcLZXGWxDPzppLWULA.png\">\n",
+    "</p>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 145
+    },
+    "id": "GoxHdp5WZ5Pv",
+    "outputId": "5494b043-6daa-43a0-dcf7-ccb9be5e303b"
+   },
+   "outputs": [],
+   "source": [
+    "data.head(1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "L3UkbCZTZmFH"
+   },
+   "outputs": [],
+   "source": [
+    "numerical = ['Income', 'Recency', 'Age', 'Spent']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "TNAsmGm6pJKy"
+   },
+   "outputs": [],
+   "source": [
+    "def detect_outliers(d):\n",
+    "  for i in d:\n",
+    "    Q3, Q1 = np.percentile(data[i], [75 ,25])\n",
+    "    IQR = Q3 - Q1\n",
+    "\n",
+    "    ul = Q3+1.5*IQR\n",
+    "    ll = Q1-1.5*IQR\n",
+    "\n",
+    "    outliers = data[i][(data[i] > ul) | (data[i] < ll)]\n",
+    "    print(f'*** {i} outlier points***', '\\n', outliers, '\\n')"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "yYeBMCQ1qa0V",
+    "outputId": "f5903f3e-fe41-4457-8cf7-f4f39795168c"
+   },
+   "outputs": [],
+   "source": [
+    "detect_outliers(numerical)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "4VkWGRX3avht"
+   },
+   "source": [
+    "We will delete some of the outlier points."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "0e-30Plyazsk"
+   },
+   "outputs": [],
+   "source": [
+    "data = data[(data['Age']<100)]\n",
+    "data = data[(data['Income']<600000)]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "Rqwk_WPdbRbr",
+    "outputId": "0d77e5ab-7a29-4ab9-e3e3-b5da48b00076"
+   },
+   "outputs": [],
+   "source": [
+    "data.shape"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "SBicFpn_iNKU"
+   },
+   "source": [
+    "# <a name='Check_for_Rare_Categories'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "7. Check for Rare Categories</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ffclpmhdoWzJ"
+   },
+   "source": [
+    "Some categories may appear a lot in the dataset, whereas some other categories appear only in a few number of observations. \n",
+    "\n",
+    "* Rare values in categorical variables tend to cause over-fitting, particularly in tree based methods.\n",
+    "* Rare labels may be present in training set, but not in test set, therefore causing over-fitting to the train set.\n",
+    "* Rare labels may appear in the test set, and not in the train set. Thus, the machine learning model will not know how to evaluate it."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "QVGchdlLiHiZ"
+   },
+   "outputs": [],
+   "source": [
+    "categorical = [var for var in data.columns if data[var].dtype=='O']"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "8VnRk9KIjdvr",
+    "outputId": "94679967-4d3c-4705-b2f3-5ee3e9b7e060",
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "# check the number of different labels\n",
+    "for var in categorical:\n",
+    "    print(data[var].value_counts() / np.float(len(data)))\n",
+    "    print()\n",
+    "    print()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "I-1s4sDsV4T1"
+   },
+   "source": [
+    "As shown above, there is no rare category in the categorical variables."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "H9b779yrj1gV"
+   },
+   "source": [
+    "# <a name='Categorical_Variables_Encoding'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "7. Categorical Variables Encoding</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "MeC3c7qacFJT",
+    "outputId": "5197701e-8314-4170-8d21-8c7dfc1e0d40"
+   },
+   "outputs": [],
+   "source": [
+    "categorical"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "TctfnVrYcLGa",
+    "outputId": "a219ff65-90bc-4b82-ad6d-f570efb69d3e"
+   },
+   "outputs": [],
+   "source": [
+    "data['Living_With'].unique()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "0ZjuamDtcyD_"
+   },
+   "source": [
+    "Since the education is a ordinal variable, we will encode it with ordinal numbers."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "2w5OsvDYjfA8"
+   },
+   "outputs": [],
+   "source": [
+    "data['Education'] = data['Education'].map({'Undergraduate':0,'Graduate':1, 'Postgraduate':2})"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "6ikio6wEdec6"
+   },
+   "outputs": [],
+   "source": [
+    "data['Living_With'] = data['Living_With'].map({'Alone':0,'Partner':1})"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "9-mqvA30kCKx",
+    "outputId": "07c7f39e-97b2-4d46-cfab-e6b5493e4a16",
+    "scrolled": true
+   },
+   "outputs": [],
+   "source": [
+    "data.dtypes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 207
+    },
+    "id": "hA2GWZQQkE5m",
+    "outputId": "db3d9ac1-e429-4be0-ceeb-906b6057ad42",
+    "scrolled": false
+   },
+   "outputs": [],
+   "source": [
+    "data.head(3)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "id": "0sxpomgmeNwq",
+    "outputId": "45f5db5c-4cbd-47b9-e16d-b1321572652e"
+   },
+   "outputs": [],
+   "source": [
+    "corrmat = data.corr()\n",
+    "\n",
+    "plt.figure(figsize=(20,20))  \n",
+    "sns.heatmap(corrmat, annot = True, cmap = 'mako', center = 0)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ccAP-v1tklVL"
+   },
+   "source": [
+    "# <a name='Feature_Scaling'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "8. Feature Scaling</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Cn0ExwxzV4T5"
+   },
+   "source": [
+    "In this section, numerical features are scaled.\n",
+    "\n",
+    "StandardScaler = $\\frac{x-\\mu}{s}$"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "Mjb2qZVv53vw"
+   },
+   "outputs": [],
+   "source": [
+    "data_old = data.copy()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "iJd6SUAKhsVr"
+   },
+   "outputs": [],
+   "source": [
+    "# creating a subset of dataframe by dropping the features on deals accepted and promotions\n",
+    "cols_del = ['AcceptedCmp3', 'AcceptedCmp4', 'AcceptedCmp5', 'AcceptedCmp1','AcceptedCmp2', 'Complain', 'Response']\n",
+    "data = data.drop(cols_del, axis=1)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "lp94TjJbkhQY"
+   },
+   "outputs": [],
+   "source": [
+    "scaler = StandardScaler()\n",
+    "data = pd.DataFrame(scaler.fit_transform(data), columns = data.columns)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 207
+    },
+    "id": "ypmltLkQh-ZA",
+    "outputId": "3139df1f-2baa-4146-b76b-f6e9446491cf"
+   },
+   "outputs": [],
+   "source": [
+    "data.head(3)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "EiuHZiXapehe"
+   },
+   "source": [
+    "# <a name='Dimensionality_Reduction'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "9. Dimensionality Reduction</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "hVtP-emGDCmT",
+    "outputId": "7b3a4a2f-2a4a-4287-b866-e3d8539beeed"
+   },
+   "outputs": [],
+   "source": [
+    "p = PCA(n_components=3)\n",
+    "p.fit(data)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "89SYsFueDO-_",
+    "outputId": "3a113e52-dc97-481d-a381-878257ad2b1a"
+   },
+   "outputs": [],
+   "source": [
+    "W = p.components_.T\n",
+    "W"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 739
+    },
+    "id": "5NGomt1TDoSL",
+    "outputId": "4ce03928-b786-47c6-b139-67ccbec46dd0"
+   },
+   "outputs": [],
+   "source": [
+    "pd.DataFrame(W, index=data.columns, columns=['W1','W2','W3'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "Odk3axNYDz7j",
+    "outputId": "63f36298-45c7-40b2-ff7b-6c6e8bc20364"
+   },
+   "outputs": [],
+   "source": [
+    "p.explained_variance_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "s7fBr_kSD-BH",
+    "outputId": "7328e6e8-0171-4145-c0f7-19eb6dff60d9"
+   },
+   "outputs": [],
+   "source": [
+    "p.explained_variance_ratio_"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 143
+    },
+    "id": "GV-nuRhPEAwY",
+    "outputId": "cfc71dca-1278-4b86-97d9-3edbf0186cfd"
+   },
+   "outputs": [],
+   "source": [
+    "pd.DataFrame(p.explained_variance_ratio_, index=range(1,4), columns=['Explained Variability'])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/"
+    },
+    "id": "dsUziL1dEdYQ",
+    "outputId": "a94658b6-b6d0-453c-98c7-bb0ec39e750a"
+   },
+   "outputs": [],
+   "source": [
+    "p.explained_variance_ratio_.cumsum()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 279
+    },
+    "id": "qFYzeK1bEd-Z",
+    "outputId": "786b489f-a9b2-4648-9485-a7a0e5785e1b"
+   },
+   "outputs": [],
+   "source": [
+    "sns.barplot(x = list(range(1,4)), y = p.explained_variance_, palette = 'GnBu_r')\n",
+    "plt.xlabel('i')\n",
+    "plt.ylabel('Lambda i');"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "5AhFwPu8HEgs"
+   },
+   "outputs": [],
+   "source": [
+    "data_PCA = pd.DataFrame(p.transform(data), columns=(['col1', 'col2', 'col3']))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 143
+    },
+    "id": "KyvwnpNdFUbc",
+    "outputId": "b785317a-00d8-4cec-eead-ce197532dabc"
+   },
+   "outputs": [],
+   "source": [
+    "data_PCA.describe().T"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 466
+    },
+    "id": "DAk4Wkk9I2nj",
+    "outputId": "59d0f6a9-d605-45c8-c8a2-725fc01a07ff"
+   },
+   "outputs": [],
+   "source": [
+    "x = data_PCA['col1']\n",
+    "y = data_PCA['col2']\n",
+    "z = data_PCA['col3']\n",
+    "\n",
+    "fig = plt.figure(figsize=(13,8))\n",
+    "ax = fig.add_subplot(111, projection='3d')\n",
+    "ax.scatter(x,y,z, c='darkred', marker='o')\n",
+    "ax.set_title('A 3D Projection of Data In the Reduced Dimension')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "evoPJLiGJwYR"
+   },
+   "source": [
+    "# <a name='Clustering'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "10. Clustering</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "YcwKVpaOKWJo"
+   },
+   "source": [
+    "Elbow Method to determine the number of clusters to be formed."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 294
+    },
+    "id": "vLCnTyBmHlfN",
+    "outputId": "ee996eec-09d9-4d4c-af57-79db5c607f56"
+   },
+   "outputs": [],
+   "source": [
+    "Elbow_M = KElbowVisualizer(KMeans(), k=10)\n",
+    "Elbow_M.fit(data_PCA)\n",
+    "Elbow_M.show();"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "id": "TKKEvj2jKm9w"
+   },
+   "outputs": [],
+   "source": [
+    "AC = AgglomerativeClustering(n_clusters=4)\n",
+    "# fit model and predict clusters\n",
+    "yhat_AC = AC.fit_predict(data_PCA)\n",
+    "data_PCA['Clusters'] = yhat_AC\n",
+    "#Adding the Clusters feature to the orignal dataframe.\n",
+    "data['Clusters'] = yhat_AC\n",
+    "data_old['Clusters'] = yhat_AC"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 466
+    },
+    "id": "4h63rfD-LaNm",
+    "outputId": "76867c72-81b5-4a46-b3fd-5a02cd26aedb"
+   },
+   "outputs": [],
+   "source": [
+    "fig = plt.figure(figsize=(13,8))\n",
+    "ax = plt.subplot(111, projection='3d', label='bla')\n",
+    "ax.scatter(x, y, z, s=40, c=data_PCA['Clusters'], marker='o', cmap='Set1_r')\n",
+    "ax.set_title('Clusters')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "qn5fECvWMkM7"
+   },
+   "source": [
+    "# <a name='Clusters_Analysis_and_Customers_Profiling'></a>\n",
+    "\n",
+    "<div style=\"border-radius:10px;\n",
+    "            background-color:#ffffff;\n",
+    "            border-style: solid;\n",
+    "            border-color: #0b0265;\n",
+    "            letter-spacing:0.5px;\">\n",
+    "\n",
+    "<center><h3 style=\"padding: 5px 0px; color:#0b0265; font-weight: bold; font-family: Cursive\">\n",
+    "11. Clusters Analysis and Customers Profiling</h3></center>\n",
+    "</div>\n",
+    "\n",
+    "<a href=\"#toc\" class=\"btn btn-primary btn-sm\" role=\"button\" aria-pressed=\"true\" style=\"color:white\" data-toggle=\"popover\">Back to Table of Contents</a>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 512
+    },
+    "id": "CD4GbBy3O-mH",
+    "outputId": "d53dfdb3-3a40-4fcf-acd1-9df3371d79b3"
+   },
+   "outputs": [],
+   "source": [
+    "pal = ['gold','#cc0000', '#ace600','#33cccc']\n",
+    "plt.figure(figsize=(13,8))\n",
+    "pl = sns.countplot(x=data['Clusters'], palette= pal)\n",
+    "pl.set_title('Distribution Of The Clusters')\n",
+    "plt.show()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 512
+    },
+    "id": "t5SxreVqPho-",
+    "outputId": "9f544c71-241a-4228-e30a-ebd115df4f09"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "pl = sns.scatterplot(data=data_old, x=data_old['Spent'], y=data_old['Income'], hue=data_old['Clusters'], palette= pal)\n",
+    "pl.set_title(\"Cluster's Profile Based on Income and Spending\")\n",
+    "plt.legend();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "0a98uKyZUYh_"
+   },
+   "source": [
+    "Income vs spending plot shows the clusters pattern\n",
+    "\n",
+    "* group 1: high spending & average income\n",
+    "* group 0: low spending & low income\n",
+    "* group 3: low spending & average income\n",
+    "* group 2: high spending & high income"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 497
+    },
+    "id": "oMC6CzZiPoTJ",
+    "outputId": "334846f8-7460-4792-b13e-46f4937232bd"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "pl = sns.swarmplot(x=data_old['Clusters'], y=data_old['Spent'], color=\"#CBEDDD\", alpha=0.7)\n",
+    "pl = sns.boxenplot(x=data_old['Clusters'], y=data_old['Spent'], palette=pal)\n",
+    "plt.show();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "ZkTVO2iN4VAD"
+   },
+   "source": [
+    "From the above plot, it can be clearly seen that cluster 2 is our biggest set of customers closely followed by cluster 1. We can explore what each cluster is spending on for the targeted marketing strategies."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "d5UyEYKJ4nO7"
+   },
+   "source": [
+    "Plotting count of total campaign accepted."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 512
+    },
+    "id": "ROTsemDh4kQB",
+    "outputId": "cd505b17-651a-4e0e-fba9-ba065be6806f"
+   },
+   "outputs": [],
+   "source": [
+    "data_old['Total_Promos'] = data_old['AcceptedCmp1']+ data_old['AcceptedCmp2']+ data_old['AcceptedCmp3']+ data_old['AcceptedCmp4']+ data_old['AcceptedCmp5']\n",
+    "\n",
+    "plt.figure(figsize=(13,8))\n",
+    "pl = sns.countplot(x=data_old['Total_Promos'], hue=data_old['Clusters'], palette= pal)\n",
+    "pl.set_title('Count Of Promotion Accepted')\n",
+    "pl.set_xlabel('Number Of Total Accepted Promotions')\n",
+    "plt.legend(loc='upper right')\n",
+    "plt.show();"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Hoo5rxhq6cDb"
+   },
+   "source": [
+    "There has not been an overwhelming response to the campaigns so far. Very few participants overall. Moreover, no one part take in all 5 of them. Perhaps better-targeted and well-planned campaigns are required to boost sales."
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "o0Yga8qJ7GlG"
+   },
+   "source": [
+    "Plotting the number of deals purchased"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 512
+    },
+    "id": "Wt1lQFv07Fbg",
+    "outputId": "c561074a-716d-4d4f-898b-503ac6b9bb98"
+   },
+   "outputs": [],
+   "source": [
+    "plt.figure(figsize=(13,8))\n",
+    "pl=sns.boxenplot(y=data_old['NumDealsPurchases'],x=data_old['Clusters'], palette= pal)\n",
+    "pl.set_title('Number of Deals Purchased');"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "fh3IJwgH7aev"
+   },
+   "source": [
+    "Unlike campaigns, the deals offered did well. It has best outcome with cluster 1 and cluster 3. However, our star customers cluster 2 are not much into the deals. Nothing seems to attract cluster 0 overwhelmingly"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "colab": {
+     "base_uri": "https://localhost:8080/",
+     "height": 1000
+    },
+    "id": "XNp7xUbO7vat",
+    "outputId": "158a9b48-8b3f-406e-acf6-412a2b58e980"
+   },
+   "outputs": [],
+   "source": [
+    "Personal = ['Kidhome', 'Teenhome', 'Age', 'Children', 'Family_Size', 'Is_Parent', 'Education', 'Living_With']\n",
+    "\n",
+    "for i in Personal:\n",
+    "    plt.figure(figsize=(13,8))\n",
+    "    sns.jointplot(x=data_old[i], y=data_old['Spent'], hue=data_old['Clusters'], kind='kde', palette=pal);"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "id": "Nn5veIWA85Oz"
+   },
+   "source": [
+    "**About Cluster 0:**\n",
+    "* The majority of these people are parents\n",
+    "* At max have 3 members in the family\n",
+    "* They majorly have one kid and typically not tennagers\n",
+    "* Relatively younger\n",
+    "\n",
+    "**About Cluster 1:**\n",
+    "* Definitely a parent\n",
+    "* At max have 4 members in the family and at least 2\n",
+    "* Most have a teeanger in home\n",
+    "* Single parents are a subset of this group\n",
+    "* Relatively older\n",
+    "\n",
+    "**About Cluster 2:**\n",
+    "* Definitely not a parent\n",
+    "* At max are only 2 members in the family.\n",
+    "* A slight majority of couples over single people\n",
+    "* Span all ages\n",
+    "* high income and high spending\n",
+    "\n",
+    "**About Cluster 3:**\n",
+    "* Definitely a parent\n",
+    "* At max have 5 members in the family and at least 2\n",
+    "* Majority of them have a teenager at home\n",
+    "* Relatively older"
+   ]
+  }
+ ],
+ "metadata": {
+  "colab": {
+   "collapsed_sections": [
+    "-E1Y3DLTu1d7",
+    "YwVXurrLOpIq",
+    "Z5sz179VQiG1",
+    "7-urp2tLRgrA",
+    "zZi_WaRMb1hm",
+    "z_z5oA1rgBmg",
+    "NcMtPLWGRY7O",
+    "iXfqcIBlW3UM",
+    "Y_hWgI-Xhfzc",
+    "SBicFpn_iNKU",
+    "H9b779yrj1gV",
+    "ccAP-v1tklVL",
+    "EiuHZiXapehe",
+    "evoPJLiGJwYR",
+    "qn5fECvWMkM7"
+   ],
+   "name": "Customer Segmentation (Clustering).ipynb",
+   "provenance": []
+  },
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.10.9"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 1
+}
